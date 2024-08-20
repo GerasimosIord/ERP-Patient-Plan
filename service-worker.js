@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/ERP-Patient-Plan/precache-manifest.b38da28e22aaece6fac10f9b22a0eb59.js"
+  "/ERP-Patient-Plan/precache-manifest.7846ed8e80dd8bb089594b6f4ba7d90a.js"
 );
 
 self.addEventListener('message', (event) => {
