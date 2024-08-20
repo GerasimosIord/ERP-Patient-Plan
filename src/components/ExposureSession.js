@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Typography, Button, TextField, Box, CircularProgress } from '@mui/material';
+import { Typography, Button, TextField, Box, CircularProgress, Paper } from '@mui/material';
 
 function ExposureSession({ erpPlan, saveErpPlan }) {
   const { categoryId, exposureId } = useParams();
@@ -29,23 +29,27 @@ function ExposureSession({ erpPlan, saveErpPlan }) {
   };
 
   const handleComplete = () => {
-    const newLog = {
-      date: new Date().toISOString(),
-      categoryName: erpPlan.categories[categoryId].name,
-      exposureDescription: exposure.description,
-      duration: timer,
-      initialAnxiety: parseInt(initialAnxiety),
-      finalAnxiety: parseInt(finalAnxiety),
-      notes: notes
-    };
+    if (validateAnxiety(initialAnxiety) && validateAnxiety(finalAnxiety)) {
+      const newLog = {
+        date: new Date().toISOString(),
+        categoryName: erpPlan.categories[categoryId].name,
+        exposureDescription: exposure.description,
+        duration: timer,
+        initialAnxiety: parseInt(initialAnxiety),
+        finalAnxiety: parseInt(finalAnxiety),
+        notes: notes
+      };
 
-    const updatedPlan = {
-      ...erpPlan,
-      progressLogs: [...erpPlan.progressLogs, newLog]
-    };
+      const updatedPlan = {
+        ...erpPlan,
+        progressLogs: [...erpPlan.progressLogs, newLog]
+      };
 
-    saveErpPlan(updatedPlan);
-    navigate('/');
+      saveErpPlan(updatedPlan);
+      navigate('/');
+    } else {
+      setAnxietyError('Please enter valid anxiety levels (0-10) before completing the session.');
+    }
   };
 
   const validateAnxiety = (value) => {
@@ -58,48 +62,44 @@ function ExposureSession({ erpPlan, saveErpPlan }) {
     return true;
   };
 
-  const handleInitialAnxietyChange = (e) => {
+  const handleAnxietyChange = (setter) => (e) => {
     const value = e.target.value;
-    setInitialAnxiety(value);
-    validateAnxiety(value);
-  };
-
-  const handleFinalAnxietyChange = (e) => {
-    const value = e.target.value;
-    setFinalAnxiety(value);
+    setter(value);
     validateAnxiety(value);
   };
 
   if (!exposure) {
-    return <Typography>Exposure not found</Typography>;
+    return <Typography variant="body1">Exposure not found</Typography>;
   }
 
   return (
-    <Box className="card">
-      <Typography variant="h4" gutterBottom>{exposure.description}</Typography>
-      <Typography variant="subtitle1" gutterBottom>Anxiety Level: {exposure.anxietyLevel}</Typography>
+    <Box className="card" pb={4}>
+      <Typography variant="h5" gutterBottom>{exposure.description}</Typography>
+      <Typography variant="subtitle2" gutterBottom>Anxiety Level: {exposure.anxietyLevel}</Typography>
       
-      <Box my={4} display="flex" justifyContent="center" alignItems="center">
-        <CircularProgress variant="determinate" value={(timer % 60) / 60 * 100} size={120} thickness={4} />
-        <Typography variant="h4" style={{ position: 'absolute' }}>
-          {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
-        </Typography>
-      </Box>
+      <Paper elevation={3} sx={{ p: 2, my: 2 }}>
+        <Box display="flex" justifyContent="center" alignItems="center" position="relative" mb={2}>
+          <CircularProgress variant="determinate" value={(timer % 60) / 60 * 100} size={100} thickness={4} />
+          <Typography variant="h5" style={{ position: 'absolute' }}>
+            {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
+          </Typography>
+        </Box>
 
-      <Button 
-        className={isRunning ? "button-secondary" : "button-primary"}
-        onClick={handleStartStop}
-        fullWidth
-        style={{ marginBottom: '20px' }}
-      >
-        {isRunning ? "Stop" : "Start"}
-      </Button>
+        <Button 
+          variant="contained"
+          color={isRunning ? "secondary" : "primary"}
+          onClick={handleStartStop}
+          fullWidth
+        >
+          {isRunning ? "Stop" : "Start"}
+        </Button>
+      </Paper>
 
       <TextField
         label="Initial Anxiety (0-10)"
         type="number"
         value={initialAnxiety}
-        onChange={handleInitialAnxietyChange}
+        onChange={handleAnxietyChange(setInitialAnxiety)}
         error={!!anxietyError}
         helperText={anxietyError}
         fullWidth
@@ -111,7 +111,7 @@ function ExposureSession({ erpPlan, saveErpPlan }) {
         label="Final Anxiety (0-10)"
         type="number"
         value={finalAnxiety}
-        onChange={handleFinalAnxietyChange}
+        onChange={handleAnxietyChange(setFinalAnxiety)}
         error={!!anxietyError}
         helperText={anxietyError}
         fullWidth
@@ -122,14 +122,21 @@ function ExposureSession({ erpPlan, saveErpPlan }) {
       <TextField
         label="Notes"
         multiline
-        rows={4}
+        rows={3}
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
         fullWidth
         margin="normal"
       />
 
-      <Button className="button-primary" onClick={handleComplete} fullWidth>
+      <Button 
+        variant="contained" 
+        color="primary" 
+        onClick={handleComplete} 
+        fullWidth
+        size="large"
+        sx={{ mt: 2 }}
+      >
         Complete Session
       </Button>
     </Box>

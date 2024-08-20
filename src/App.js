@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Container, List, ListItem, ListItemText, Paper, Box, CircularProgress, Button } from '@mui/material';
+import { AppBar, Toolbar, Typography, Container } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 
 import ExposureHierarchy from './components/ExposureHierarchy';
 import ExposureSession from './components/ExposureSession';
@@ -123,19 +120,6 @@ function App() {
             <Route path="/settings" element={<Settings erpPlan={erpPlan} saveErpPlan={saveErpPlan} />} />
           </Routes>
         </Container>
-        <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
-          <List component="nav">
-            <ListItem button component={Link} to="/">
-              <ListItemText primary="Hierarchy" />
-            </ListItem>
-            <ListItem button component={Link} to="/progress">
-              <ListItemText primary="Progress" />
-            </ListItem>
-            <ListItem button component={Link} to="/settings">
-              <ListItemText primary="Settings" />
-            </ListItem>
-          </List>
-        </Paper>
       </Router>
     </ThemeProvider>
   );
